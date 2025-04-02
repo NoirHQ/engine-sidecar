@@ -15,8 +15,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod cli;
-pub mod config;
-pub mod logger;
-pub mod rpc;
-pub mod server;
+pub mod eth;

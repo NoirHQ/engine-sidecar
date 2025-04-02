@@ -15,8 +15,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod cli;
-pub mod config;
-pub mod logger;
-pub mod rpc;
-pub mod server;
+use alloy_json_rpc::RpcObject;
+use alloy_primitives::{Bytes, B256};
+use jsonrpsee::core::RpcResult;
+use reth_rpc_eth_api::EthApiServer;
+
+pub struct EthApi;
+
+#[async_trait::async_trait]
+impl<T: RpcObject, B: RpcObject, R: RpcObject, H: RpcObject> EthApiServer<T, B, R, H> for EthApi {
+    async fn send_raw_transaction(&self, bytes: Bytes) -> RpcResult<B256> {
+        Ok(Default::default())
+    }
+}
