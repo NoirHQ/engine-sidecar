@@ -24,18 +24,20 @@ use jsonrpsee::{
 
 pub async fn handle_rpc(
     State(module): State<RpcModule<()>>,
-    Json(payload): Json<String>,
+    Json(payload): Json<Value>,
 ) -> (StatusCode, Json<Value>) {
-    match module.raw_json_request(&payload, 1).await {
+    let request = serde_json::to_string(&payload).unwrap();
+
+    match module.raw_json_request(&request, 1).await {
         Ok((response, _)) => (
             StatusCode::OK,
             serde_json::from_str::<Value>(&response).map(Json).unwrap(),
         ),
         Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
+            StatusCode::BAD_REQUEST,
             Json(
                 serde_json::to_value(ErrorObject::owned(
-                    ErrorCode::InternalError.code(),
+                    ErrorCode::ParseError.code(),
                     e.to_string(),
                     None::<()>,
                 ))

@@ -15,16 +15,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use alloy_json_rpc::RpcObject;
+use alloy_consensus::transaction::Recovered;
 use alloy_primitives::{Bytes, B256};
 use jsonrpsee::core::RpcResult;
+use reth_ethereum_primitives::TransactionSigned;
 use reth_rpc_eth_api::EthApiServer;
+use reth_rpc_eth_types::utils::recover_raw_transaction;
 
 pub struct EthApi;
 
 #[async_trait::async_trait]
-impl<T: RpcObject, B: RpcObject, R: RpcObject, H: RpcObject> EthApiServer<T, B, R, H> for EthApi {
+impl EthApiServer<(), (), (), ()> for EthApi {
     async fn send_raw_transaction(&self, bytes: Bytes) -> RpcResult<B256> {
-        Ok(Default::default())
+        let recovered: Recovered<TransactionSigned> = recover_raw_transaction(&bytes)?;
+        let signer = recovered.signer();
+
+        tracing::debug!("Ethereum transaction signer: {:?}", signer);
+
+        Ok(*recovered.hash())
     }
 }

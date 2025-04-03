@@ -19,10 +19,14 @@ pub mod cors;
 pub mod router;
 pub mod rpc;
 
-use crate::config::server::{ItemOrList, ServerConfig};
+use crate::{
+    config::server::{ItemOrList, ServerConfig},
+    rpc::eth::EthApi,
+};
 use axum::{error_handling::HandleErrorLayer, http::StatusCode};
 use cors::cors_layer;
 use jsonrpsee::RpcModule;
+use reth_rpc_eth_api::EthApiServer;
 use std::{net::SocketAddr, time::Duration};
 use tokio::signal;
 use tower::{BoxError, ServiceBuilder};
@@ -61,7 +65,9 @@ impl Server {
             .trace_for_http()
             .layer(cors_layer(self.cors.clone()).expect("Failed to create CORS layer"));
 
-        let module = RpcModule::new(());
+        let mut module = RpcModule::new(());
+        module.merge(EthApi.into_rpc()).unwrap();
+
         let app = router::create_router(module).layer(middleware.into_inner());
 
         tracing::info!("Starting server at {}", self.addr);

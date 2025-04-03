@@ -5,7 +5,9 @@ members = [
     "sidecar",
     "vendor/reth/ethereum/primitives",
     "vendor/reth/primitives-traits",
-    "vendor/reth/rpc-eth-api",
+    "vendor/reth/rpc/rpc-eth-api",
+    "vendor/reth/rpc/rpc-eth-types",
+    "vendor/reth/rpc/rpc-server-types",
 ]
 
 [workspace.package]
@@ -24,6 +26,8 @@ axum = "0.8"
 clap = { version = "4.5", features = ["derive"] }
 derive_more = { version = "2", features = ["full"] }
 jsonrpsee = { version = "0.24", features = ["client", "macros", "server"] }
+jsonrpsee-core = "0.24"
+jsonrpsee-types = "0.24"
 secp256k1 = { version = "0.30", features = ["global-context", "recovery"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -45,4 +49,6 @@ alloy-rlp = "0.3"
 # reth
 reth-ethereum-primitives = { path = "vendor/reth/ethereum/primitives" }
 reth-primitives-traits = { path = "vendor/reth/primitives-traits" }
-reth-rpc-eth-api = { path = "vendor/reth/rpc-eth-api" }
+reth-rpc-eth-api = { path = "vendor/reth/rpc/rpc-eth-api" }
+reth-rpc-eth-types = { path = "vendor/reth/rpc/rpc-eth-types" }
+reth-rpc-server-types = { path = "vendor/reth/rpc/rpc-server-types" }
