@@ -1,5 +1,7 @@
 //! Implementation specific Errors for the `eth_` namespace.
 
+pub mod api;
+
 use reth_rpc_server_types::result::internal_rpc_err;
 
 /// A trait to convert an error to an RPC error.

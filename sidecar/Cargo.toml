@@ -19,6 +19,7 @@ anyhow = { workspace = true }
 async-trait = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
+hex = { workspace = true }
 jsonrpsee = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -32,8 +33,10 @@ tracing-subscriber = { workspace = true }
 alloy-consensus = { workspace = true }
 alloy-eips = { workspace = true }
 alloy-json-rpc = { workspace = true }
+alloy-network = { workspace = true }
 alloy-primitives = { workspace = true }
 
 reth-ethereum-primitives = { workspace = true }
+reth-rpc-api = { workspace = true }
 reth-rpc-eth-api = { workspace = true }
 reth-rpc-eth-types = { workspace = true }

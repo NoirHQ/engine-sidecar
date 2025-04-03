@@ -21,12 +21,14 @@ pub mod rpc;
 
 use crate::{
     config::server::{ItemOrList, ServerConfig},
-    rpc::eth::EthApi,
+    rpc::{eth::EthApi, net::NetApi},
 };
+use alloy_network::Ethereum;
 use axum::{error_handling::HandleErrorLayer, http::StatusCode};
 use cors::cors_layer;
 use jsonrpsee::RpcModule;
-use reth_rpc_eth_api::EthApiServer;
+use reth_rpc_api::NetApiServer;
+use reth_rpc_eth_api::{EthApiServer, RpcBlock};
 use std::{net::SocketAddr, time::Duration};
 use tokio::signal;
 use tower::{BoxError, ServiceBuilder};
@@ -67,6 +69,7 @@ impl Server {
 
         let mut module = RpcModule::new(());
         module.merge(EthApi.into_rpc()).unwrap();
+        module.merge(NetApi.into_rpc()).unwrap();
 
         let app = router::create_router(module).layer(middleware.into_inner());
 

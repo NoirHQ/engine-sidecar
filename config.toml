@@ -1,3 +1,5 @@
 [server]
-host = "0.0.0.0"
-port = 8080
+listen_address = "127.0.0.1"
+port = 8545
+cors = "all"
+request_timeout_seconds = 120

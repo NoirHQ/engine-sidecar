@@ -1,8 +1,9 @@
 //! Implementation of the [`jsonrpsee`] generated [`EthApiServer`] trait. Handles RPC requests for
 //! the `eth_` namespace.
 
+use alloy_eips::BlockNumberOrTag;
 use alloy_json_rpc::RpcObject;
-use alloy_primitives::{Bytes, B256};
+use alloy_primitives::{Bytes, B256, U256, U64};
 use jsonrpsee::{core::RpcResult, proc_macros::rpc};
 
 /// Eth rpc interface: <https://ethereum.github.io/execution-apis/api-documentation/>
@@ -25,21 +26,21 @@ pub trait EthApi<T: RpcObject, B: RpcObject, R: RpcObject, H: RpcObject> {
     // #[method(name = "accounts")]
     // fn accounts(&self) -> RpcResult<Vec<Address>>;
 
-    // /// Returns the number of most recent block.
-    // #[method(name = "blockNumber")]
-    // fn block_number(&self) -> RpcResult<U256>;
+    /// Returns the number of most recent block.
+    #[method(name = "blockNumber")]
+    fn block_number(&self) -> RpcResult<U256>;
 
-    // /// Returns the chain ID of the current network.
-    // #[method(name = "chainId")]
-    // async fn chain_id(&self) -> RpcResult<Option<U64>>;
+    /// Returns the chain ID of the current network.
+    #[method(name = "chainId")]
+    async fn chain_id(&self) -> RpcResult<Option<U64>>;
 
-    // /// Returns information about a block by hash.
-    // #[method(name = "getBlockByHash")]
-    // async fn block_by_hash(&self, hash: B256, full: bool) -> RpcResult<Option<B>>;
+    /// Returns information about a block by hash.
+    #[method(name = "getBlockByHash")]
+    async fn block_by_hash(&self, hash: B256, full: bool) -> RpcResult<Option<B>>;
 
-    // /// Returns information about a block by number.
-    // #[method(name = "getBlockByNumber")]
-    // async fn block_by_number(&self, number: BlockNumberOrTag, full: bool) -> RpcResult<Option<B>>;
+    /// Returns information about a block by number.
+    #[method(name = "getBlockByNumber")]
+    async fn block_by_number(&self, number: BlockNumberOrTag, full: bool) -> RpcResult<Option<B>>;
 
     // /// Returns the number of transactions in a block from a block matching the given block hash.
     // #[method(name = "getBlockTransactionCountByHash")]

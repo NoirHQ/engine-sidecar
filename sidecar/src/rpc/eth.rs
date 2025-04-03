@@ -15,23 +15,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::default;
+
 use alloy_consensus::transaction::Recovered;
-use alloy_primitives::{Bytes, B256};
+use alloy_eips::BlockNumberOrTag;
+use alloy_network::Ethereum;
+use alloy_primitives::{Bytes, B256, U256, U64};
 use jsonrpsee::core::RpcResult;
 use reth_ethereum_primitives::TransactionSigned;
-use reth_rpc_eth_api::EthApiServer;
+use reth_rpc_eth_api::{EthApiServer, RpcBlock};
 use reth_rpc_eth_types::utils::recover_raw_transaction;
 
 pub struct EthApi;
 
 #[async_trait::async_trait]
-impl EthApiServer<(), (), (), ()> for EthApi {
+impl EthApiServer<(), RpcBlock<Ethereum>, (), ()> for EthApi {
     async fn send_raw_transaction(&self, bytes: Bytes) -> RpcResult<B256> {
+        tracing::debug!("Ethereum transaction: {}", hex::encode(&bytes));
+
         let recovered: Recovered<TransactionSigned> = recover_raw_transaction(&bytes)?;
         let signer = recovered.signer();
 
-        tracing::debug!("Ethereum transaction signer: {:?}", signer);
+        tracing::debug!("Signer: {:?}", signer);
 
         Ok(*recovered.hash())
+    }
+
+    fn block_number(&self) -> RpcResult<U256> {
+        Ok(U256::from(1))
+    }
+
+    async fn chain_id(&self) -> RpcResult<Option<U64>> {
+        Ok(Some(U64::from_le_slice(&hex::decode("deadbeef").unwrap())))
+    }
+
+    async fn block_by_hash(&self, hash: B256, full: bool) -> RpcResult<Option<RpcBlock<Ethereum>>> {
+        Ok(Some(RpcBlock::<Ethereum>::default()))
+    }
+
+    async fn block_by_number(
+        &self,
+        number: BlockNumberOrTag,
+        full: bool,
+    ) -> RpcResult<Option<RpcBlock<Ethereum>>> {
+        Ok(Some(RpcBlock::<Ethereum>::default()))
     }
 }
