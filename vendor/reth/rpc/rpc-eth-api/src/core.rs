@@ -1,9 +1,10 @@
 //! Implementation of the [`jsonrpsee`] generated [`EthApiServer`] trait. Handles RPC requests for
 //! the `eth_` namespace.
 
-use alloy_eips::BlockNumberOrTag;
+use alloy_eips::{BlockId, BlockNumberOrTag};
 use alloy_json_rpc::RpcObject;
-use alloy_primitives::{Bytes, B256, U256, U64};
+use alloy_primitives::{Address, Bytes, B256, U256, U64};
+use alloy_rpc_types_eth::{state::StateOverride, TransactionRequest};
 use jsonrpsee::{core::RpcResult, proc_macros::rpc};
 
 /// Eth rpc interface: <https://ethereum.github.io/execution-apis/api-documentation/>
@@ -136,9 +137,9 @@ pub trait EthApi<T: RpcObject, B: RpcObject, R: RpcObject, H: RpcObject> {
     // #[method(name = "getTransactionReceipt")]
     // async fn transaction_receipt(&self, hash: B256) -> RpcResult<Option<R>>;
 
-    // /// Returns the balance of the account of given address.
-    // #[method(name = "getBalance")]
-    // async fn balance(&self, address: Address, block_number: Option<BlockId>) -> RpcResult<U256>;
+    /// Returns the balance of the account of given address.
+    #[method(name = "getBalance")]
+    async fn balance(&self, address: Address, block_number: Option<BlockId>) -> RpcResult<U256>;
 
     // /// Returns the value from a storage position at a given address
     // #[method(name = "getStorageAt")]
@@ -219,15 +220,15 @@ pub trait EthApi<T: RpcObject, B: RpcObject, R: RpcObject, H: RpcObject> {
     //     block_number: Option<BlockId>,
     // ) -> RpcResult<AccessListResult>;
 
-    // /// Generates and returns an estimate of how much gas is necessary to allow the transaction to
-    // /// complete.
-    // #[method(name = "estimateGas")]
-    // async fn estimate_gas(
-    //     &self,
-    //     request: TransactionRequest,
-    //     block_number: Option<BlockId>,
-    //     state_override: Option<StateOverride>,
-    // ) -> RpcResult<U256>;
+    /// Generates and returns an estimate of how much gas is necessary to allow the transaction to
+    /// complete.
+    #[method(name = "estimateGas")]
+    async fn estimate_gas(
+        &self,
+        request: TransactionRequest,
+        block_number: Option<BlockId>,
+        state_override: Option<StateOverride>,
+    ) -> RpcResult<U256>;
 
     // /// Returns the current price per gas in wei.
     // #[method(name = "gasPrice")]

@@ -35,6 +35,7 @@ alloy-eips = { workspace = true }
 alloy-json-rpc = { workspace = true }
 alloy-network = { workspace = true }
 alloy-primitives = { workspace = true }
+alloy-rpc-types-eth = { workspace = true }
 
 reth-ethereum-primitives = { workspace = true }
 reth-rpc-api = { workspace = true }

@@ -3417,6 +3417,7 @@ dependencies = [
  "alloy-json-rpc",
  "alloy-network",
  "alloy-primitives",
+ "alloy-rpc-types-eth",
  "anyhow",
  "async-trait",
  "axum",
