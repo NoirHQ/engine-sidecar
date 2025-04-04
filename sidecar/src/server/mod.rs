@@ -21,7 +21,7 @@ pub mod rpc;
 
 use crate::{
     config::server::{ItemOrList, ServerConfig},
-    rpc::{eth::EthApi, net::NetApi},
+    ethereum::rpc::{eth::EthApi, net::NetApi},
 };
 use axum::{error_handling::HandleErrorLayer, http::StatusCode};
 use cors::cors_layer;

@@ -15,9 +15,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod aptos;
-pub mod cli;
-pub mod config;
-pub mod ethereum;
-pub mod logger;
-pub mod server;
+pub mod adapter;

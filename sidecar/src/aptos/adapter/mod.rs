@@ -15,9 +15,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod aptos;
-pub mod cli;
-pub mod config;
-pub mod ethereum;
-pub mod logger;
-pub mod server;
+use aptos_api_types::{transaction::PendingTransaction, SubmitTransactionRequest};
+
+#[async_trait::async_trait]
+pub trait AptosAdapter {
+    type Error;
+
+    async fn submit_transaction(&self, transaction: SubmitTransactionRequest) -> Result<PendingTransaction, Self::Error>;
+}
