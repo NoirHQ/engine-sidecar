@@ -15,7 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{config::Config, server::Server};
+use crate::{config::Config, engine::EngineClient, server::Server};
 use clap::{command, Parser};
 use std::path::PathBuf;
 
@@ -31,7 +31,14 @@ impl Cli {
     pub async fn run(self) {
         let config = Config::load_from_path(self.config);
 
-        let server = Server::new(config.server);
-        server.start().await;
+        let engine_config = config.engine.unwrap_or_default();
+        let basic_config = engine_config.basic();
+
+        let adapter = engine_config.adapter().build_adapter(basic_config);
+        let client = EngineClient::new(adapter);
+
+        let server = Server::new(config.server.unwrap_or_default());
+
+        server.start(client).await;
     }
 }

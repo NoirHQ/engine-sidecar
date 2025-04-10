@@ -29,7 +29,7 @@ pub trait EthApi<T: RpcObject, B: RpcObject, R: RpcObject, H: RpcObject> {
 
     /// Returns the number of most recent block.
     #[method(name = "blockNumber")]
-    fn block_number(&self) -> RpcResult<U256>;
+    async fn block_number(&self) -> RpcResult<U256>;
 
     /// Returns the chain ID of the current network.
     #[method(name = "chainId")]

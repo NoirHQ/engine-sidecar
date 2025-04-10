@@ -1,5 +1,14 @@
 [server]
-listen_address = "127.0.0.1"
+host = "0.0.0.0"
 port = 8545
 cors = "all"
-request_timeout_seconds = 120
+request_timeout_seconds = 90
+
+[engine]
+coin_type = "0x1::aptos_coin::AptosCoin"
+auth_func = "0x100::evm::authenticate"
+entry_func = "0x100::evm::transact"
+
+[engine.remote]
+endpoint = "http://127.0.0.1:8080"
+timeout = 60

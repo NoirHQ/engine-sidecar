@@ -21,7 +21,8 @@ pub mod rpc;
 
 use crate::{
     config::server::{ItemOrList, ServerConfig},
-    ethereum::rpc::{eth::EthApi, net::NetApi},
+    engine::EngineClient,
+    rpc::{eth::EthApi, net::NetApi},
 };
 use axum::{error_handling::HandleErrorLayer, http::StatusCode};
 use cors::cors_layer;
@@ -33,23 +34,22 @@ use tokio::signal;
 use tower::{BoxError, ServiceBuilder};
 use tower_http::ServiceBuilderExt;
 
-#[derive(Debug, Clone)]
 pub struct Server {
-    pub addr: SocketAddr,
-    pub request_timeout_seconds: Duration,
-    pub cors: Option<ItemOrList<String>>,
+    addr: SocketAddr,
+    request_timeout: Duration,
+    cors: Option<ItemOrList<String>>,
 }
 
 impl Server {
     pub fn new(config: ServerConfig) -> Self {
         Server {
             addr: config.addr(),
-            request_timeout_seconds: config.request_timeout(),
+            request_timeout: config.request_timeout(),
             cors: config.cors,
         }
     }
 
-    pub async fn start(&self) {
+    pub async fn start(&self, client: EngineClient) {
         let listener = tokio::net::TcpListener::bind(self.addr)
             .await
             .expect("Failed to bind to address");
@@ -62,12 +62,12 @@ impl Server {
                     StatusCode::INTERNAL_SERVER_ERROR
                 }
             }))
-            .timeout(self.request_timeout_seconds)
+            .timeout(self.request_timeout)
             .trace_for_http()
             .layer(cors_layer(self.cors.clone()).expect("Failed to create CORS layer"));
 
         let mut module = RpcModule::new(());
-        module.merge(EthApi.into_rpc()).unwrap();
+        module.merge(EthApi::new(client).into_rpc()).unwrap();
         module.merge(NetApi.into_rpc()).unwrap();
 
         let app = router::create_router(module).layer(middleware.into_inner());

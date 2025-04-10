@@ -15,26 +15,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod engine;
 pub mod server;
 
+use engine::EngineConfig;
 use serde::Deserialize;
 use server::ServerConfig;
 use std::{fs, path::Path};
 
 #[derive(Debug, Clone, Deserialize, Default)]
 pub struct Config {
-    pub server: ServerConfig,
+    pub server: Option<ServerConfig>,
+    pub engine: Option<EngineConfig>,
 }
 
 impl Config {
     pub fn load_from_path(path: Option<impl AsRef<Path>>) -> Self {
         if let Some(path) = path {
-            if fs::exists(&path).expect("Config file does not exist") {
-                let config_str = fs::read_to_string(path).expect("Failed to read config file");
-                toml::from_str::<Config>(&config_str).expect("Failed to parse config file")
-            } else {
-                Config::default()
-            }
+            let config_str = fs::read_to_string(path).expect("Failed to read config file");
+            toml::from_str::<Config>(&config_str).expect("Failed to parse config file")
         } else {
             Config::default()
         }

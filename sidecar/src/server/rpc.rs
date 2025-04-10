@@ -26,9 +26,9 @@ pub async fn handle_rpc(
     State(module): State<RpcModule<()>>,
     Json(payload): Json<Value>,
 ) -> (StatusCode, Json<Value>) {
-    let request = serde_json::to_string(&payload).unwrap();
+    let raw_request = serde_json::to_string(&payload).unwrap();
 
-    match module.raw_json_request(&request, 1).await {
+    match module.raw_json_request(&raw_request, 1).await {
         Ok((response, _)) => (
             StatusCode::OK,
             serde_json::from_str::<Value>(&response).map(Json).unwrap(),

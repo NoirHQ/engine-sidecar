@@ -34,7 +34,7 @@ impl<T> ItemOrList<T> {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Default)]
 pub struct ServerConfig {
     pub host: Option<String>,
     pub port: Option<u16>,
@@ -42,27 +42,17 @@ pub struct ServerConfig {
     pub cors: Option<ItemOrList<String>>,
 }
 
-impl Default for ServerConfig {
-    fn default() -> Self {
-        Self {
-            host: Some("127.0.0.1".to_string()),
-            port: Some(8545),
-            request_timeout_seconds: Some(120),
-            cors: None,
-        }
-    }
-}
-
 impl ServerConfig {
     pub fn addr(&self) -> SocketAddr {
-        let host = self.host.clone().unwrap_or("127.0.0.1".to_string());
+        let host = self.host.as_deref().unwrap_or("127.0.0.1");
         let port = self.port.unwrap_or(8545);
 
-        format!("{}:{}", host, port).parse().unwrap()
+        format!("{}:{}", host, port)
+            .parse()
+            .expect("Failed to parse server address")
     }
 
     pub fn request_timeout(&self) -> Duration {
-        let seconds = self.request_timeout_seconds.unwrap_or(120);
-        Duration::from_secs(seconds)
+        Duration::from_secs(self.request_timeout_seconds.unwrap_or(90))
     }
 }
