@@ -36,23 +36,16 @@ impl EngineAdapter for EngineClient {
         self.inner.coin_type()
     }
 
-    fn auth_func(&self) -> &str {
-        self.inner.auth_func()
-    }
-
-    fn entry_func(&self) -> &str {
-        self.inner.entry_func()
-    }
-
     async fn get_ledger_info(&self) -> Result<aptos_api_types::IndexResponse> {
         self.inner.get_ledger_info().await
     }
 
     async fn submit_transaction(
         &self,
-        transaction: aptos_api_types::SubmitTransactionRequest,
+        sender: move_core_types::account_address::AccountAddress,
+        transaction: Vec<u8>,
     ) -> Result<aptos_api_types::PendingTransaction> {
-        self.inner.submit_transaction(transaction).await
+        self.inner.submit_transaction(sender, transaction).await
     }
 
     async fn get_block_by_height(
@@ -67,12 +60,15 @@ impl EngineAdapter for EngineClient {
 
     async fn get_account(
         &self,
-        address: aptos_api_types::Address,
-    ) -> Result<aptos_api_types::AccountData> {
+        address: move_core_types::account_address::AccountAddress,
+    ) -> Result<aptos_rest_client::types::Account> {
         self.inner.get_account(address).await
     }
 
-    async fn get_account_balance(&self, address: aptos_api_types::Address) -> Result<u64> {
+    async fn get_account_balance(
+        &self,
+        address: move_core_types::account_address::AccountAddress,
+    ) -> Result<u64> {
         self.inner.get_account_balance(address).await
     }
 }

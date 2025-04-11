@@ -22,16 +22,12 @@ use std::borrow::Cow;
 #[derive(Debug, Clone)]
 pub struct LocalEngineAdapter {
     coin_type: Cow<'static, str>,
-    auth_func: Cow<'static, str>,
-    entry_func: Cow<'static, str>,
 }
 
 impl LocalEngineAdapter {
-    pub fn new(coin_type: String, auth_func: String, entry_func: String) -> Self {
+    pub fn new(coin_type: String) -> Self {
         Self {
             coin_type: Cow::Owned(coin_type),
-            auth_func: Cow::Owned(auth_func),
-            entry_func: Cow::Owned(entry_func),
         }
     }
 }
@@ -42,28 +38,21 @@ impl EngineAdapter for LocalEngineAdapter {
         &self.coin_type
     }
 
-    fn auth_func(&self) -> &str {
-        &self.auth_func
-    }
-
-    fn entry_func(&self) -> &str {
-        &self.entry_func
-    }
-
     async fn get_ledger_info(&self) -> Result<aptos_api_types::IndexResponse> {
         unimplemented!();
     }
 
     async fn submit_transaction(
         &self,
-        _transaction: aptos_api_types::SubmitTransactionRequest,
+        _sender: move_core_types::account_address::AccountAddress,
+        _transaction: Vec<u8>,
     ) -> Result<aptos_api_types::PendingTransaction> {
         unimplemented!();
     }
 
     async fn get_block_by_height(
         &self,
-        _block_height: u64,
+        _height: u64,
         _with_transactions: bool,
     ) -> Result<aptos_api_types::Block> {
         unimplemented!();
@@ -71,12 +60,15 @@ impl EngineAdapter for LocalEngineAdapter {
 
     async fn get_account(
         &self,
-        _address: aptos_api_types::Address,
-    ) -> Result<aptos_api_types::AccountData> {
+        _address: move_core_types::account_address::AccountAddress,
+    ) -> Result<aptos_rest_client::types::Account> {
         unimplemented!();
     }
 
-    async fn get_account_balance(&self, _address: aptos_api_types::Address) -> Result<u64> {
+    async fn get_account_balance(
+        &self,
+        _address: move_core_types::account_address::AccountAddress,
+    ) -> Result<u64> {
         unimplemented!();
     }
 }

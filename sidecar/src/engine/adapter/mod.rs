@@ -15,6 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod client;
 pub mod local;
 pub mod remote;
 
@@ -24,30 +25,27 @@ use anyhow::Result;
 pub trait EngineAdapter {
     fn coin_type(&self) -> &str;
 
-    fn auth_func(&self) -> &str;
-
-    fn entry_func(&self) -> &str;
-
     async fn get_ledger_info(&self) -> Result<aptos_api_types::IndexResponse>;
 
     async fn submit_transaction(
         &self,
-        transaction: aptos_api_types::SubmitTransactionRequest,
+        sender: move_core_types::account_address::AccountAddress,
+        transaction: Vec<u8>,
     ) -> Result<aptos_api_types::PendingTransaction>;
 
     async fn get_block_by_height(
         &self,
-        block_height: u64,
+        height: u64,
         with_transactions: bool,
     ) -> Result<aptos_api_types::Block, anyhow::Error>;
 
     async fn get_account(
         &self,
-        address: aptos_api_types::Address,
-    ) -> Result<aptos_api_types::AccountData, anyhow::Error>;
+        address: move_core_types::account_address::AccountAddress,
+    ) -> Result<aptos_rest_client::types::Account>;
 
     async fn get_account_balance(
         &self,
-        address: aptos_api_types::Address,
+        address: move_core_types::account_address::AccountAddress,
     ) -> Result<u64, anyhow::Error>;
 }

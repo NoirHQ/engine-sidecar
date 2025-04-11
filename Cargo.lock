@@ -497,6 +497,7 @@ dependencies = [
 name = "aptos-crypto"
 version = "0.0.3"
 dependencies = [
+ "anyhow",
  "bcs",
  "bytes",
  "hex",
@@ -505,6 +506,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde-name",
+ "thiserror 2.0.12",
  "tiny-keccak",
 ]
 
@@ -530,6 +532,7 @@ dependencies = [
  "aptos-api-types",
  "aptos-types",
  "bcs",
+ "move-core-types",
  "reqwest",
  "serde",
  "serde_json",
@@ -554,6 +557,7 @@ dependencies = [
  "aptos-crypto",
  "aptos-crypto-derive",
  "bcs",
+ "hex",
  "move-core-types",
  "once_cell",
  "serde",
@@ -3976,11 +3980,17 @@ dependencies = [
  "alloy-rpc-types-eth",
  "anyhow",
  "aptos-api-types",
+ "aptos-global-constants",
+ "aptos-rest-client",
+ "aptos-sdk",
+ "aptos-types",
  "async-trait",
  "axum",
+ "bcs",
  "clap",
  "hex",
  "jsonrpsee",
+ "move-core-types",
  "reqwest",
  "reth-ethereum-primitives",
  "reth-rpc-api",

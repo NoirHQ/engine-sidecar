@@ -20,13 +20,6 @@ use alloy_consensus::transaction::Recovered;
 use alloy_eips::{BlockId, BlockNumberOrTag};
 use alloy_network::Ethereum;
 use alloy_rpc_types_eth::{state::StateOverride, TransactionRequest};
-use aptos_api_types::{
-    transaction::{
-        AbstractionSignature, AccountSignature, EntryFunctionPayload, TransactionSignature,
-        UserTransactionRequestInner,
-    },
-    EntryFunctionId, HexEncodedBytes, SubmitTransactionRequest, TransactionPayload,
-};
 use jsonrpsee::{
     core::RpcResult,
     types::{error::INTERNAL_ERROR_CODE, ErrorObjectOwned},
@@ -34,7 +27,6 @@ use jsonrpsee::{
 use reth_ethereum_primitives::TransactionSigned;
 use reth_rpc_eth_api::{EthApiServer, RpcBlock};
 use reth_rpc_eth_types::utils::recover_raw_transaction;
-use std::str::FromStr;
 
 pub struct EthApi<Adapter> {
     adapter: Adapter,
@@ -63,45 +55,14 @@ where
         let recovered: Recovered<TransactionSigned> = recover_raw_transaction(&bytes)?;
         let signer = recovered.signer();
 
-        let signature = TransactionSignature::SingleSender(AccountSignature::AbstractionSignature(
-            AbstractionSignature {
-                function_info: self.adapter.auth_func().into(),
-                auth_data: HexEncodedBytes(vec![]),
-            },
-        ));
-
         let sender = to_aptos_address(&signer);
-        let account_info = self
-            .adapter
-            .get_account(sender)
-            .await
-            .map_err(|e| internal_error(e.to_string()))?;
-
-        // TODO: Set gas amount and gas unit price
-        let request = SubmitTransactionRequest {
-            user_transaction_request: UserTransactionRequestInner {
-                sender,
-                sequence_number: aptos_api_types::U64::from(account_info.sequence_number.0),
-                max_gas_amount: aptos_api_types::U64::from(2_000_000),
-                gas_unit_price: aptos_api_types::U64::from(100),
-                expiration_timestamp_secs: aptos_api_types::U64::from(0),
-                payload: TransactionPayload::EntryFunctionPayload(EntryFunctionPayload {
-                    function: EntryFunctionId::from_str(self.adapter.entry_func())
-                        .map_err(|e| internal_error(e.to_string()))?,
-                    type_arguments: vec![],
-                    arguments: vec![bytes.to_string().into()],
-                }),
-            },
-            signature,
-        };
-
         let pending = self
             .adapter
-            .submit_transaction(request)
+            .submit_transaction(sender, bytes.0.to_vec())
             .await
             .map_err(|e| internal_error(e.to_string()))?;
 
-        tracing::debug!("hash: {}", pending.hash);
+        tracing::debug!("Submitted transaction: {:?}", pending);
 
         Ok(*recovered.hash())
     }
@@ -191,11 +152,13 @@ where
     }
 }
 
-pub fn to_aptos_address(address: &alloy_primitives::Address) -> aptos_api_types::Address {
+pub fn to_aptos_address(
+    address: &alloy_primitives::Address,
+) -> move_core_types::account_address::AccountAddress {
     let mut bytes: [u8; 32] = [0u8; 32];
     bytes[12..].copy_from_slice(address.0.as_slice());
 
-    aptos_api_types::Address::from_str(&hex::encode(bytes)).unwrap()
+    move_core_types::account_address::AccountAddress::new(bytes)
 }
 
 pub fn internal_error(message: impl Into<String>) -> ErrorObjectOwned {
@@ -206,7 +169,6 @@ pub fn internal_error(message: impl Into<String>) -> ErrorObjectOwned {
 pub mod tests {
     use super::to_aptos_address;
     use alloy_primitives::hex::FromHex;
-    use std::str::FromStr;
 
     #[test]
     fn to_bytes32_test() {
@@ -217,7 +179,7 @@ pub mod tests {
 
         assert_eq!(
             aptos_address,
-            aptos_api_types::Address::from_str(
+            move_core_types::account_address::AccountAddress::from_hex(
                 "0x000000000000000000000000C96aAa54E2d44c299564da76e1cD3184A2386B8D"
             )
             .unwrap()

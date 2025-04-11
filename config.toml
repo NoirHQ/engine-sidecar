@@ -2,7 +2,7 @@
 host = "0.0.0.0"
 port = 8545
 cors = "all"
-request_timeout_seconds = 90
+request_timeout_seconds = 30
 
 [engine]
 coin_type = "0x1::aptos_coin::AptosCoin"
@@ -11,4 +11,5 @@ entry_func = "0x100::evm::transact"
 
 [engine.remote]
 endpoint = "http://127.0.0.1:8080"
-timeout = 60
+timeout = 10
+chain_id = 4

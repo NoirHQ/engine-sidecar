@@ -23,3 +23,5 @@ url = { workspace = true }
 
 aptos-api-types = { workspace = true }
 aptos-types = { workspace = true }
+
+move-core-types = { workspace = true }

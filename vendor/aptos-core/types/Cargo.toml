@@ -15,6 +15,7 @@ rust-version = "1.78.0"
 [dependencies]
 anyhow = { workspace = true }
 bcs = { workspace = true }
+hex = { workspace = true }
 once_cell = { workspace = true }
 serde = { workspace = true }
 serde_bytes = { workspace = true }

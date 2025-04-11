@@ -4,11 +4,12 @@
 
 pub mod authenticator;
 pub mod script;
+pub mod user_transaction_context;
 
 use crate::chain_id::ChainId;
 use aptos_crypto::hash::HashValue;
 use aptos_crypto_derive::{BCSCryptoHash, CryptoHasher};
-use authenticator::TransactionAuthenticator;
+use authenticator::{AccountAuthenticator, TransactionAuthenticator};
 use move_core_types::account_address::AccountAddress;
 use once_cell::sync::OnceCell;
 use script::EntryFunction;
@@ -121,5 +122,30 @@ pub struct SignedTransaction {
 impl PartialEq for SignedTransaction {
     fn eq(&self, other: &Self) -> bool {
         self.raw_txn == other.raw_txn && self.authenticator == other.authenticator
+    }
+}
+
+impl SignedTransaction {
+    pub fn new_signed_transaction(
+        raw_txn: RawTransaction,
+        authenticator: TransactionAuthenticator,
+    ) -> SignedTransaction {
+        SignedTransaction {
+            raw_txn,
+            authenticator,
+            raw_txn_size: OnceCell::new(),
+            authenticator_size: OnceCell::new(),
+            committed_hash: OnceCell::new(),
+        }
+    }
+
+    pub fn new_single_sender(
+        raw_txn: RawTransaction,
+        authenticator: AccountAuthenticator,
+    ) -> SignedTransaction {
+        Self::new_signed_transaction(
+            raw_txn,
+            TransactionAuthenticator::single_sender(authenticator),
+        )
     }
 }

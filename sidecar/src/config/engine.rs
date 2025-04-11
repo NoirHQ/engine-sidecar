@@ -15,11 +15,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::time::Duration;
-
 use crate::engine::adapter::{
     local::LocalEngineAdapter, remote::RemoteEngineAdapter, EngineAdapter,
 };
+use aptos_types::chain_id::NamedChain;
 use serde::Deserialize;
 
 #[derive(Debug, Clone, Deserialize, Default)]
@@ -90,9 +89,7 @@ impl AdapterConfig {
                 entry_func,
                 remote.clone(),
             )),
-            AdapterConfig::Local => {
-                Box::new(LocalEngineAdapter::new(coin_type, auth_func, entry_func))
-            }
+            AdapterConfig::Local => Box::new(LocalEngineAdapter::new(coin_type)),
         }
     }
 }
@@ -101,6 +98,7 @@ impl AdapterConfig {
 pub struct RemoteEngineConfig {
     pub endpoint: Option<String>,
     pub timeout: Option<u64>,
+    pub chain_id: Option<u8>,
 }
 
 impl RemoteEngineConfig {
@@ -110,7 +108,11 @@ impl RemoteEngineConfig {
             .unwrap_or("http://127.0.0.1:8080/v1")
     }
 
-    pub fn timeout(&self) -> Duration {
-        Duration::from_secs(self.timeout.unwrap_or(60))
+    pub fn timeout(&self) -> u64 {
+        self.timeout.unwrap_or(10)
+    }
+
+    pub fn chain_id(&self) -> u8 {
+        self.chain_id.unwrap_or(NamedChain::TESTING.id())
     }
 }

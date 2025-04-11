@@ -15,9 +15,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::EngineAdapter;
+use super::{client::AAClient, EngineAdapter};
 use crate::config::engine::RemoteEngineConfig;
 use anyhow::{anyhow, Ok, Result};
+use aptos_global_constants::{GAS_UNIT_PRICE, MAX_GAS_AMOUNT};
+use aptos_rest_client::{types::Account, Client};
 use reqwest::{Response, StatusCode, Url};
 use serde::de::DeserializeOwned;
 use std::{borrow::Cow, marker::PhantomData};
@@ -25,10 +27,7 @@ use std::{borrow::Cow, marker::PhantomData};
 #[derive(Debug, Clone)]
 pub struct RemoteEngineAdapter {
     coin_type: Cow<'static, str>,
-    endpoint: Url,
-    client: reqwest::Client,
-    auth_func: Cow<'static, str>,
-    entry_func: Cow<'static, str>,
+    client: AAClient,
 }
 
 impl RemoteEngineAdapter {
@@ -38,17 +37,18 @@ impl RemoteEngineAdapter {
         entry_func: String,
         config: RemoteEngineConfig,
     ) -> Self {
-        let client = reqwest::ClientBuilder::new()
-            .timeout(config.timeout())
-            .build()
-            .expect("Failed to build reqwest client");
+        let node_url = Url::parse(config.endpoint()).expect("Failed parse adapter url");
+        let client = AAClient::new(
+            Client::new(node_url),
+            auth_func,
+            entry_func,
+            config.chain_id(),
+            config.timeout(),
+        );
 
         Self {
             coin_type: Cow::Owned(coin_type),
-            endpoint: Url::parse(config.endpoint()).expect("Failed parse adapter url"),
             client,
-            auth_func: Cow::Owned(auth_func),
-            entry_func: Cow::Owned(entry_func),
         }
     }
 }
@@ -59,87 +59,63 @@ impl EngineAdapter for RemoteEngineAdapter {
         &self.coin_type
     }
 
-    fn auth_func(&self) -> &str {
-        &self.auth_func
-    }
-
-    fn entry_func(&self) -> &str {
-        &self.entry_func
-    }
-
     async fn get_ledger_info(&self) -> Result<aptos_api_types::IndexResponse> {
-        let response = self.client.get(self.endpoint.clone()).send().await?;
-
-        ResponseHandler::<aptos_api_types::IndexResponse>::new("Failed to get ledger info")
-            .handle(response)
-            .await
+        Ok(self.client.api_client.get_index().await?.into_inner())
     }
 
     async fn submit_transaction(
         &self,
-        transaction: aptos_api_types::SubmitTransactionRequest,
+        sender: move_core_types::account_address::AccountAddress,
+        tx: Vec<u8>,
     ) -> Result<aptos_api_types::PendingTransaction> {
-        let response = self
-            .client
-            .post(format!("{}/transactions", self.endpoint))
-            .json(&transaction)
-            .send()
-            .await?;
+        let account = self.get_account(sender).await?;
 
-        ResponseHandler::<aptos_api_types::PendingTransaction>::new("Failed to submit transaction")
-            .handle(response)
+        self.client
+            .submit_transaction(
+                sender,
+                tx,
+                account.sequence_number,
+                MAX_GAS_AMOUNT,
+                GAS_UNIT_PRICE,
+            )
             .await
     }
 
     async fn get_block_by_height(
         &self,
-        block_height: u64,
-        _with_transactions: bool,
+        height: u64,
+        with_transactions: bool,
     ) -> Result<aptos_api_types::Block> {
-        let response = self
+        Ok(self
             .client
-            .get(format!(
-                "{}/blocks/by_height/{}",
-                self.endpoint, block_height
-            ))
-            .send()
-            .await?;
-
-        ResponseHandler::<aptos_api_types::Block>::new("Failed to get block by height")
-            .handle(response)
-            .await
+            .api_client
+            .get_block_by_height(height, with_transactions)
+            .await?
+            .into_inner())
     }
 
     async fn get_account(
         &self,
-        address: aptos_api_types::Address,
-    ) -> Result<aptos_api_types::AccountData> {
-        let response = self
+        address: move_core_types::account_address::AccountAddress,
+    ) -> Result<Account> {
+        Ok(self
             .client
-            .get(format!("{}/accounts/{}", self.endpoint, address))
-            .send()
-            .await?;
-
-        ResponseHandler::<aptos_api_types::AccountData>::new("Failed to get account data")
-            .handle(response)
-            .await
+            .api_client
+            .get_account(address)
+            .await?
+            .into_inner())
     }
 
-    async fn get_account_balance(&self, address: aptos_api_types::Address) -> Result<u64> {
-        let response = self
+    async fn get_account_balance(
+        &self,
+        address: move_core_types::account_address::AccountAddress,
+    ) -> Result<u64> {
+        Ok(self
             .client
-            .get(format!(
-                "{}/accounts/{}/balance/{}",
-                self.endpoint,
-                address,
-                self.coin_type(),
-            ))
-            .send()
-            .await?;
-
-        ResponseHandler::<u64>::new("Failed to get balance")
-            .handle(response)
-            .await
+            .api_client
+            .get_account_balance(address, &self.coin_type)
+            .await?
+            .into_inner())
     }
 }
 

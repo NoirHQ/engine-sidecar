@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 pub mod hash;
+pub mod traits;
 
 // Reexport once_cell and serde_name for use in CryptoHasher Derive implementation.
 #[doc(hidden)]

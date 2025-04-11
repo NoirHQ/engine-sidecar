@@ -7,15 +7,21 @@ pub mod client_builder;
 pub mod error;
 pub mod response;
 pub mod state;
+pub mod types;
 
 use anyhow::anyhow;
-use aptos_api_types::{mime_types::BCS_SIGNED_TRANSACTION, AptosError, PendingTransaction};
+use aptos_api_types::{
+    mime_types::BCS_SIGNED_TRANSACTION, AptosError, Block, IndexResponse, PendingTransaction,
+};
 use aptos_types::transaction::SignedTransaction;
 use client_builder::{AptosBaseUrl, ClientBuilder};
 use error::RestError;
+use move_core_types::account_address::AccountAddress;
 use reqwest::{header::CONTENT_TYPE, Client as ReqwestClient};
 use response::Response;
+use serde::de::DeserializeOwned;
 pub use state::State;
+use types::Account;
 use url::Url;
 
 pub const DEFAULT_VERSION_PATH_BASE: &str = "v1/";
@@ -60,6 +66,39 @@ impl Client {
         Ok(self.base_url.join(&self.version_path_base)?.join(path)?)
     }
 
+    /// Gets the balance of a specific asset type for an account.
+    /// The `asset_type` parameter can be either:
+    /// * A coin type (e.g. "0x1::aptos_coin::AptosCoin")
+    /// * A fungible asset metadata address (e.g. "0xa")
+    ///   For more details, see: https://aptos.dev/en/build/apis/fullnode-rest-api-reference#tag/accounts/GET/accounts/{address}/balance/{asset_type}
+    pub async fn get_account_balance(
+        &self,
+        address: AccountAddress,
+        asset_type: &str,
+    ) -> AptosResult<Response<u64>> {
+        let url = self.build_path(&format!(
+            "accounts/{}/balance/{}",
+            address.to_hex(),
+            asset_type
+        ))?;
+        let response = self.inner.get(url).send().await?;
+        self.json(response).await
+    }
+
+    pub async fn get_index(&self) -> AptosResult<Response<IndexResponse>> {
+        self.get(self.build_path("")?).await
+    }
+
+    pub async fn get_account(&self, address: AccountAddress) -> AptosResult<Response<Account>> {
+        let url = self.build_path(&format!("accounts/{}", address.to_hex()))?;
+        let response = self.inner.get(url).send().await?;
+        self.json(response).await
+    }
+
+    async fn get<T: DeserializeOwned>(&self, url: Url) -> AptosResult<Response<T>> {
+        self.json(self.inner.get(url).send().await?).await
+    }
+
     pub async fn submit(
         &self,
         txn: &SignedTransaction,
@@ -76,6 +115,18 @@ impl Client {
             .await?;
 
         self.json::<PendingTransaction>(response).await
+    }
+
+    pub async fn get_block_by_height(
+        &self,
+        height: u64,
+        with_transactions: bool,
+    ) -> AptosResult<Response<Block>> {
+        self.get(self.build_path(&format!(
+            "blocks/by_height/{}?with_transactions={}",
+            height, with_transactions
+        ))?)
+        .await
     }
 
     async fn json<T: serde::de::DeserializeOwned>(
