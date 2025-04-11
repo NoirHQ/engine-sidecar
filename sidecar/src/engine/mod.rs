@@ -44,7 +44,7 @@ impl EngineAdapter for EngineClient {
         self.inner.entry_func()
     }
 
-    async fn get_ledger_info(&self) -> Result<aptos_api_types::index::IndexResponse> {
+    async fn get_ledger_info(&self) -> Result<aptos_api_types::IndexResponse> {
         self.inner.get_ledger_info().await
     }
 

@@ -10,7 +10,7 @@ use move_core_types::{
 use serde::{de::Error as _, Deserialize, Deserializer, Serialize, Serializer};
 use std::{fmt, fmt::Display, str::FromStr};
 
-use crate::{address::Address, wrapper::IdentifierWrapper};
+use crate::{address::Address, IdentifierWrapper};
 
 macro_rules! define_integer_type {
     ($n:ident, $t:ty, $d:literal) => {

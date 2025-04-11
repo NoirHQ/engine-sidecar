@@ -4,7 +4,8 @@
 // The data in IndexResponse is flattened into a single JSON map to offer
 // easier parsing for clients.
 
-use crate::{config::RoleType, U64};
+use crate::U64;
+use aptos_config::config::RoleType;
 use serde::{Deserialize, Serialize};
 
 /// The struct holding all data returned to the client by the

@@ -2,11 +2,15 @@
 // Parts of the project are originally copyright © Meta Platforms, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
+pub mod authenticator;
 pub mod script;
 
 use crate::chain_id::ChainId;
+use aptos_crypto::hash::HashValue;
 use aptos_crypto_derive::{BCSCryptoHash, CryptoHasher};
+use authenticator::TransactionAuthenticator;
 use move_core_types::account_address::AccountAddress;
+use once_cell::sync::OnceCell;
 use script::EntryFunction;
 use serde::{Deserialize, Serialize};
 
@@ -79,5 +83,43 @@ impl RawTransaction {
             expiration_timestamp_secs,
             chain_id,
         }
+    }
+}
+
+/// A transaction that has been signed.
+///
+/// A `SignedTransaction` is a single transaction that can be atomically executed. Clients submit
+/// these to validator nodes, and the validator and executor submits these to the VM.
+///
+/// **IMPORTANT:** The signature of a `SignedTransaction` is not guaranteed to be verified. For a
+/// transaction whose signature is statically guaranteed to be verified, see
+/// [`SignatureCheckedTransaction`].
+#[derive(Clone, Eq, Serialize, Deserialize)]
+pub struct SignedTransaction {
+    /// The raw transaction
+    raw_txn: RawTransaction,
+
+    /// Public key and signature to authenticate
+    authenticator: TransactionAuthenticator,
+
+    /// A cached size of the raw transaction bytes.
+    /// Prevents serializing the same transaction multiple times to determine size.
+    #[serde(skip)]
+    raw_txn_size: OnceCell<usize>,
+
+    /// A cached size of the authenticator.
+    /// Prevents serializing the same authenticator multiple times to determine size.
+    #[serde(skip)]
+    authenticator_size: OnceCell<usize>,
+
+    /// A cached hash of the transaction.
+    #[serde(skip)]
+    committed_hash: OnceCell<HashValue>,
+}
+
+/// PartialEq ignores the cached OnceCell fields that may or may not be initialized.
+impl PartialEq for SignedTransaction {
+    fn eq(&self, other: &Self) -> bool {
+        self.raw_txn == other.raw_txn && self.authenticator == other.authenticator
     }
 }
