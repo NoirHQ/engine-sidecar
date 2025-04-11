@@ -4,8 +4,12 @@ resolver = "2"
 members = [
     "sidecar",
     "vendor/aptos-core/api/types",
+    "vendor/aptos-core/config/global-constants",
     "vendor/aptos-core/crates/aptos-crypto",
+    "vendor/aptos-core/crates/aptos-crypto-derive",
+    "vendor/aptos-core/sdk",
     "vendor/aptos-core/third_party/move/move-core/types",
+    "vendor/aptos-core/types",
     "vendor/reth/crates/ethereum/primitives",
     "vendor/reth/crates/primitives-traits",
     "vendor/reth/crates/rpc/rpc-api",
@@ -27,7 +31,6 @@ anyhow = "1"
 async-trait = "0.1"
 auto_impl = "1"
 axum = "0.8"
-bcs = "0.1"
 bytes = "1.10"
 clap = { version = "4.5", features = ["derive"] }
 derive_more = { version = "2", features = ["full"] }
@@ -41,13 +44,17 @@ more-asserts = "0.3"
 num = "0.4"
 once_cell = "1.21"
 primitive-types = "0.10"
+proc-macro2 = "1.0"
+quote = "1.0"
 rand = "0.8"
 ref-cast = "1.0"
 reqwest = { version = "0.12", features = ["json"] }
 secp256k1 = { version = "0.30", features = ["global-context", "recovery"] }
 serde = { version = "1.0", features = ["derive"] }
+serde-name = "0.1"
 serde_bytes = "0.11"
 serde_json = "1.0"
+syn = "1.0"
 thiserror = "2"
 tiny-keccak = { version = "2.0", features = ["keccak", "sha3"] }
 tokio = { version = "1.44", features = ["full"] }
@@ -77,5 +84,10 @@ reth-rpc-server-types = { path = "vendor/reth/crates/rpc/rpc-server-types" }
 
 aptos-api-types = { path = "vendor/aptos-core/api/types" }
 aptos-crypto = { path = "vendor/aptos-core/crates/aptos-crypto" }
+aptos-crypto-derive = { path = "vendor/aptos-core/crates/aptos-crypto-derive" }
+aptos-global-constants = { path = "vendor/aptos-core/config/global-constants" }
+aptos-sdk = { path = "vendor/aptos-core/sdk" }
+aptos-types = { path = "vendor/aptos-core/types" }
+bcs = { git = "https://github.com/aptos-labs/bcs.git", rev = "d31fab9d81748e2594be5cd5cdf845786a30562d" }
 
 move-core-types = { path = "vendor/aptos-core/third_party/move/move-core/types" }

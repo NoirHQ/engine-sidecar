@@ -493,7 +493,44 @@ dependencies = [
  "once_cell",
  "rand 0.8.5",
  "serde",
+ "serde-name",
  "tiny-keccak",
+]
+
+[[package]]
+name = "aptos-crypto-derive"
+version = "0.0.3"
+dependencies = [
+ "anyhow",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "aptos-global-constants"
+version = "0.1.0"
+
+[[package]]
+name = "aptos-sdk"
+version = "0.0.3"
+dependencies = [
+ "aptos-global-constants",
+ "aptos-types",
+ "move-core-types",
+]
+
+[[package]]
+name = "aptos-types"
+version = "0.0.3"
+dependencies = [
+ "anyhow",
+ "aptos-crypto",
+ "aptos-crypto-derive",
+ "bcs",
+ "move-core-types",
+ "serde",
+ "serde_bytes",
 ]
 
 [[package]]
@@ -777,9 +814,8 @@ checksum = "89e25b6adfb930f02d1981565a6e5d9c547ac15a96606256d3b59040e5cd4ca3"
 
 [[package]]
 name = "bcs"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85b6598a2f5d564fb7855dc6b06fd1c38cff5a72bd8b863a4d021938497b440a"
+version = "0.1.4"
+source = "git+https://github.com/aptos-labs/bcs.git?rev=d31fab9d81748e2594be5cd5cdf845786a30562d#d31fab9d81748e2594be5cd5cdf845786a30562d"
 dependencies = [
  "serde",
  "thiserror 1.0.69",
@@ -3667,6 +3703,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f0e2c6ed6606019b4e29e69dbaba95b11854410e5347d525002456dbbb786b6"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-name"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12c47087018ec281d1cdab673d36aea22d816b54d498264029c05d5fa1910da6"
+dependencies = [
+ "serde",
+ "thiserror 1.0.69",
 ]
 
 [[package]]

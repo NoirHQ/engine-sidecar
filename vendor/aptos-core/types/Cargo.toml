@@ -1,6 +1,6 @@
 [package]
-name = "aptos-crypto"
-description = "Aptos crypto"
+name = "aptos-types"
+description = "Aptos core types"
 version = "0.0.3"
 
 # Workspace inherited keys
@@ -13,12 +13,12 @@ repository = "https://github.com/aptos-labs/aptos-core"
 rust-version = "1.78.0"
 
 [dependencies]
+anyhow = { workspace = true }
 bcs = { workspace = true }
-bytes = { workspace = true }
-hex = { workspace = true }
-more-asserts = { workspace = true }
-once_cell = { workspace = true }
-rand = { workspace = true }
 serde = { workspace = true }
-serde-name = { workspace = true }
-tiny-keccak = { workspace = true }
+serde_bytes = { workspace = true }
+
+aptos-crypto = { workspace = true }
+aptos-crypto-derive = { workspace = true }
+
+move-core-types = { workspace = true }

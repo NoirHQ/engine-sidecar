@@ -1,0 +1,24 @@
+[package]
+name = "aptos-crypto-derive"
+description = "Custom derives for `aptos-crypto`"
+version = "0.0.3"
+
+# Workspace inherited keys
+authors = ["Aptos Labs <opensource@aptoslabs.com>"]
+edition = "2021"
+homepage = "https://aptoslabs.com"
+license = "Apache-2.0"
+publish = false
+repository = "https://github.com/aptos-labs/aptos-core"
+rust-version = "1.78.0"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
+syn = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }

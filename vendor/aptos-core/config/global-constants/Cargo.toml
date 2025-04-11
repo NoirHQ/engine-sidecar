@@ -1,0 +1,19 @@
+[package]
+name = "aptos-global-constants"
+description = "Aptos's global constant crate: the source of truth for constant definitions that span multiple crates"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = ["Aptos Labs <opensource@aptoslabs.com>"]
+edition = "2021"
+homepage = "https://aptoslabs.com"
+license = "Apache-2.0"
+publish = false
+repository = "https://github.com/aptos-labs/aptos-core"
+rust-version = "1.78.0"
+
+[dependencies]
+
+[features]
+default = []
+testing = []

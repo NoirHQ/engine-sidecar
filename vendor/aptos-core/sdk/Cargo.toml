@@ -1,0 +1,18 @@
+[package]
+name = "aptos-sdk"
+description = "The Official Aptos SDK"
+version = "0.0.3"
+
+# Workspace inherited keys
+authors = ["Aptos Labs <opensource@aptoslabs.com>"]
+edition = "2021"
+homepage = "https://aptoslabs.com"
+license = "Apache-2.0"
+publish = false
+repository = "https://github.com/aptos-labs/aptos-core"
+rust-version = "1.78.0"
+
+[dependencies]
+aptos-global-constants = { workspace = true }
+aptos-types = { workspace = true }
+move-core-types = { workspace = true }
