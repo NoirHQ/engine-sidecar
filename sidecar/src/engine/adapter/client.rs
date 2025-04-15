@@ -24,8 +24,7 @@ use aptos_types::{
     function_info::FunctionInfo,
     move_utils::MemberId,
     transaction::{
-        authenticator::AccountAuthenticator, script::EntryFunction, SignedTransaction,
-        TransactionPayload,
+        authenticator::AccountAuthenticator, EntryFunction, SignedTransaction, TransactionPayload,
     },
 };
 use move_core_types::account_address::AccountAddress;

@@ -3,15 +3,6 @@ resolver = "2"
 
 members = [
     "sidecar",
-    "vendor/aptos-core/api/types",
-    "vendor/aptos-core/config",
-    "vendor/aptos-core/config/global-constants",
-    "vendor/aptos-core/crates/aptos-crypto",
-    "vendor/aptos-core/crates/aptos-crypto-derive",
-    "vendor/aptos-core/crates/aptos-rest-client",
-    "vendor/aptos-core/sdk",
-    "vendor/aptos-core/third_party/move/move-core/types",
-    "vendor/aptos-core/types",
     "vendor/reth/crates/ethereum/primitives",
     "vendor/reth/crates/primitives-traits",
     "vendor/reth/crates/rpc/rpc-api",
@@ -85,14 +76,15 @@ reth-rpc-eth-api = { path = "vendor/reth/crates/rpc/rpc-eth-api" }
 reth-rpc-eth-types = { path = "vendor/reth/crates/rpc/rpc-eth-types" }
 reth-rpc-server-types = { path = "vendor/reth/crates/rpc/rpc-server-types" }
 
-aptos-api-types = { path = "vendor/aptos-core/api/types" }
-aptos-config = { path = "vendor/aptos-core/config" }
-aptos-crypto = { path = "vendor/aptos-core/crates/aptos-crypto" }
-aptos-crypto-derive = { path = "vendor/aptos-core/crates/aptos-crypto-derive" }
-aptos-global-constants = { path = "vendor/aptos-core/config/global-constants" }
-aptos-rest-client = { path = "vendor/aptos-core/crates/aptos-rest-client" }
-aptos-sdk = { path = "vendor/aptos-core/sdk" }
-aptos-types = { path = "vendor/aptos-core/types" }
+aptos-api-types = { git = "https://github.com/aptos-labs/aptos-core", branch = "devnet" }
+aptos-global-constants = { git = "https://github.com/aptos-labs/aptos-core", branch = "devnet" }
+aptos-rest-client = { git = "https://github.com/aptos-labs/aptos-core", branch = "devnet" }
+aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "devnet" }
+aptos-types = { git = "https://github.com/aptos-labs/aptos-core", branch = "devnet" }
 bcs = { git = "https://github.com/aptos-labs/bcs.git", rev = "d31fab9d81748e2594be5cd5cdf845786a30562d" }
 
-move-core-types = { path = "vendor/aptos-core/third_party/move/move-core/types" }
+move-core-types = { git = "https://github.com/aptos-labs/aptos-core", branch = "devnet" }
+
+[patch.crates-io]
+merlin = { git = "https://github.com/aptos-labs/merlin" }
+x25519-dalek = { git = "https://github.com/aptos-labs/x25519-dalek", branch = "zeroize_v1" }
