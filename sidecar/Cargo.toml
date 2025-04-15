@@ -1,5 +1,5 @@
 [package]
-name = "sidecar"
+name = "engine-sidecar"
 version = "0.1.0"
 authors.workspace = true
 repository.workspace = true
@@ -7,11 +7,11 @@ license.workspace = true
 edition.workspace = true
 
 [lib]
-name = "sidecar"
+name = "engine_sidecar"
 path = "src/lib.rs"
 
 [[bin]]
-name = "sidecar"
+name = "engine_sidecar"
 path = "src/main.rs"
 
 [dependencies]

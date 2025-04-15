@@ -6,10 +6,10 @@ members = ["sidecar"]
 [workspace.package]
 authors = ["code0xff <ian.jungyong.um@gmail.com>"]
 edition = "2021"
-homepage = "https://github.com/NoirHQ/sidecar"
+homepage = "https://github.com/NoirHQ/engine-sidecar"
 license = "Apache-2.0"
 publish = false
-repository = "https://github.com/NoirHQ/sidecar"
+repository = "https://github.com/NoirHQ/engine-sidecar"
 
 [workspace.dependencies]
 anyhow = "1"

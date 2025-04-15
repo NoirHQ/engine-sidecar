@@ -19,9 +19,9 @@ use clap::Parser;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    sidecar::logger::enable_logger();
+    engine_sidecar::logger::enable_logger();
 
-    sidecar::cli::Cli::parse().run().await;
+    engine_sidecar::cli::Cli::parse().run().await;
 
     Ok(())
 }
