@@ -30,4 +30,15 @@ impl NetApiServer for NetApi {
         tracing::debug!("version rpc request received");
         Ok(U64::from_be_slice(&hex::decode("deadbeef").unwrap()).to_string())
     }
+
+    /// Handler for `net_peerCount`
+    fn peer_count(&self) -> Result<U64> {
+        // Ok(U64::from(self.network.num_connected_peers()))
+        unimplemented!();
+    }
+
+    /// Handler for `net_listening`
+    fn is_listening(&self) -> Result<bool> {
+        Ok(true)
+    }
 }

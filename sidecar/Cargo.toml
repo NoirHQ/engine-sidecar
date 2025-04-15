@@ -33,11 +33,13 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 alloy-consensus = { workspace = true }
+alloy-dyn-abi = { workspace = true }
 alloy-eips = { workspace = true }
 alloy-json-rpc = { workspace = true }
 alloy-network = { workspace = true }
 alloy-primitives = { workspace = true }
 alloy-rpc-types-eth = { workspace = true }
+alloy-serde = { workspace = true }
 
 reth-ethereum-primitives = { workspace = true }
 reth-rpc-api = { workspace = true }

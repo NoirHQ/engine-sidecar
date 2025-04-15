@@ -1,15 +1,7 @@
 [workspace]
 resolver = "2"
 
-members = [
-    "sidecar",
-    "vendor/reth/crates/ethereum/primitives",
-    "vendor/reth/crates/primitives-traits",
-    "vendor/reth/crates/rpc/rpc-api",
-    "vendor/reth/crates/rpc/rpc-eth-api",
-    "vendor/reth/crates/rpc/rpc-eth-types",
-    "vendor/reth/crates/rpc/rpc-server-types",
-]
+members = ["sidecar"]
 
 [workspace.package]
 authors = ["code0xff <ian.jungyong.um@gmail.com>"]
@@ -61,20 +53,22 @@ url = "2.4"
 
 # eth
 alloy-consensus = "0.13"
+alloy-dyn-abi = "0.8"
 alloy-eips = { version = "0.13", features = ["serde"] }
 alloy-json-rpc = "0.13"
 alloy-network = "0.13"
 alloy-primitives = "0.8"
 alloy-rlp = "0.3"
 alloy-rpc-types-eth = "0.13"
+alloy-serde = "0.13"
 
 # reth
-reth-ethereum-primitives = { path = "vendor/reth/crates/ethereum/primitives" }
-reth-primitives-traits = { path = "vendor/reth/crates/primitives-traits" }
-reth-rpc-api = { path = "vendor/reth/crates/rpc/rpc-api" }
-reth-rpc-eth-api = { path = "vendor/reth/crates/rpc/rpc-eth-api" }
-reth-rpc-eth-types = { path = "vendor/reth/crates/rpc/rpc-eth-types" }
-reth-rpc-server-types = { path = "vendor/reth/crates/rpc/rpc-server-types" }
+reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v1.3.7" }
+reth-primitives-traits = { git = "https://github.com/paradigmxyz/reth", tag = "v1.3.7" }
+reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.3.7" }
+reth-rpc-eth-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.3.7" }
+reth-rpc-eth-types = { git = "https://github.com/paradigmxyz/reth", tag = "v1.3.7" }
+reth-rpc-server-types = { git = "https://github.com/paradigmxyz/reth", tag = "v1.3.7" }
 
 aptos-api-types = { git = "https://github.com/aptos-labs/aptos-core", branch = "devnet" }
 aptos-global-constants = { git = "https://github.com/aptos-labs/aptos-core", branch = "devnet" }
