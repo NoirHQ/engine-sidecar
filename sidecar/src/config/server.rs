@@ -53,6 +53,6 @@ impl ServerConfig {
     }
 
     pub fn request_timeout(&self) -> Duration {
-        Duration::from_secs(self.request_timeout_seconds.unwrap_or(90))
+        Duration::from_secs(self.request_timeout_seconds.unwrap_or(30))
     }
 }

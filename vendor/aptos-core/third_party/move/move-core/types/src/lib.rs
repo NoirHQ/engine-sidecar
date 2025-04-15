@@ -4,6 +4,7 @@
 
 //! Core types for Move.
 
+pub mod ability;
 pub mod account_address;
 pub mod identifier;
 pub mod language_storage;

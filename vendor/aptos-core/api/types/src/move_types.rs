@@ -4,11 +4,16 @@
 
 use anyhow::format_err;
 use move_core_types::{
+    ability::{Ability, AbilitySet},
     language_storage::{StructTag, TypeTag},
     parser::{parse_struct_tag, parse_type_tag},
 };
 use serde::{de::Error as _, Deserialize, Deserializer, Serialize, Serializer};
-use std::{fmt, fmt::Display, str::FromStr};
+use std::{
+    collections::BTreeMap,
+    fmt::{self, Display},
+    str::FromStr,
+};
 
 use crate::{address::Address, IdentifierWrapper};
 
@@ -503,3 +508,182 @@ impl TryFrom<MoveStructTag> for StructTag {
         })
     }
 }
+
+/// Move module bytecode along with it's ABI
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MoveModuleBytecode {
+    pub bytecode: HexEncodedBytes,
+    // We don't need deserialize MoveModule as it should be serialized
+    // from `bytecode`.
+    #[serde(skip_deserializing)]
+    pub abi: Option<MoveModule>,
+}
+
+/// A Move module
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MoveModule {
+    pub address: Address,
+    pub name: IdentifierWrapper,
+    /// Friends of the module
+    pub friends: Vec<MoveModuleId>,
+    /// Public functions of the module
+    pub exposed_functions: Vec<MoveFunction>,
+    /// Structs of the module
+    pub structs: Vec<MoveStruct>,
+}
+
+/// A move struct
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MoveStruct {
+    pub name: IdentifierWrapper,
+    /// Whether the struct is a native struct of Move
+    pub is_native: bool,
+    /// Whether the struct is marked with the #[event] annotation
+    pub is_event: bool,
+    /// Abilities associated with the struct
+    pub abilities: Vec<MoveAbility>,
+    /// Generic types associated with the struct
+    pub generic_type_params: Vec<MoveStructGenericTypeParam>,
+    /// Fields associated with the struct
+    pub fields: Vec<MoveStructField>,
+}
+
+/// Move generic type param
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MoveStructGenericTypeParam {
+    /// Move abilities tied to the generic type param and associated with the type that uses it
+    pub constraints: Vec<MoveAbility>,
+    /// Whether the type is a phantom type
+    // #[oai(skip)]
+    pub is_phantom: bool,
+}
+
+/// Move struct field
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MoveStructField {
+    pub name: IdentifierWrapper,
+    #[serde(rename = "type")]
+    // #[oai(rename = "type")]
+    pub typ: MoveType,
+}
+
+/// A move ability e.g. drop, store
+// TODO: Consider finding a way to derive NewType here instead of using the
+// custom macro, since some of the enum type information (such as the
+// variants) is currently being lost.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MoveAbility(pub Ability);
+
+impl From<Ability> for MoveAbility {
+    fn from(a: Ability) -> Self {
+        Self(a)
+    }
+}
+
+impl From<MoveAbility> for Ability {
+    fn from(a: MoveAbility) -> Self {
+        a.0
+    }
+}
+
+impl fmt::Display for MoveAbility {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let st = match self.0 {
+            Ability::Copy => "copy",
+            Ability::Drop => "drop",
+            Ability::Store => "store",
+            Ability::Key => "key",
+        };
+        write!(f, "{}", st)
+    }
+}
+
+impl FromStr for MoveAbility {
+    type Err = anyhow::Error;
+
+    fn from_str(ability: &str) -> Result<Self, Self::Err> {
+        Ok(Self(match ability {
+            "copy" => Ability::Copy,
+            "drop" => Ability::Drop,
+            "store" => Ability::Store,
+            "key" => Ability::Key,
+            _ => return Err(anyhow::anyhow!("Invalid ability string: {}", ability)),
+        }))
+    }
+}
+
+impl Serialize for MoveAbility {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        self.to_string().serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for MoveAbility {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let ability = <String>::deserialize(deserializer)?;
+        ability.parse().map_err(D::Error::custom)
+    }
+}
+
+/// Move function
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MoveFunction {
+    pub name: IdentifierWrapper,
+    pub visibility: MoveFunctionVisibility,
+    /// Whether the function can be called as an entry function directly in a transaction
+    pub is_entry: bool,
+    /// Whether the function is a view function or not
+    pub is_view: bool,
+    /// Generic type params associated with the Move function
+    pub generic_type_params: Vec<MoveFunctionGenericTypeParam>,
+    /// Parameters associated with the move function
+    pub params: Vec<MoveType>,
+    /// Return type of the function
+    #[serde(rename = "return")]
+    // #[oai(rename = "return")]
+    pub return_: Vec<MoveType>,
+}
+
+/// Move function visibility
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+// #[oai(rename_all = "snake_case")]
+pub enum MoveFunctionVisibility {
+    /// Visible only by this module
+    Private,
+    /// Visible by all modules
+    Public,
+    /// Visible by friend modules
+    Friend,
+}
+
+/// Move function generic type param
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MoveFunctionGenericTypeParam {
+    /// Move abilities tied to the generic type param and associated with the function that uses it
+    pub constraints: Vec<MoveAbility>,
+}
+
+impl From<&AbilitySet> for MoveFunctionGenericTypeParam {
+    fn from(constraints: &AbilitySet) -> Self {
+        Self {
+            constraints: constraints.into_iter().map(MoveAbility::from).collect(),
+        }
+    }
+}
+
+/// A parsed Move resource
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MoveResource {
+    #[serde(rename = "type")]
+    // #[oai(rename = "type")]
+    pub typ: MoveStructTag,
+    pub data: MoveStructValue,
+}
+
+/// A JSON map representation of a Move struct's or closure's inner values
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MoveStructValue(pub BTreeMap<IdentifierWrapper, serde_json::Value>);

@@ -17,12 +17,11 @@
 
 use super::{client::AAClient, EngineAdapter};
 use crate::config::engine::RemoteEngineConfig;
-use anyhow::{anyhow, Ok, Result};
+use anyhow::{Ok, Result};
 use aptos_global_constants::{GAS_UNIT_PRICE, MAX_GAS_AMOUNT};
 use aptos_rest_client::{types::Account, Client};
-use reqwest::{Response, StatusCode, Url};
-use serde::de::DeserializeOwned;
-use std::{borrow::Cow, marker::PhantomData};
+use reqwest::Url;
+use std::borrow::Cow;
 
 #[derive(Debug, Clone)]
 pub struct RemoteEngineAdapter {
@@ -116,40 +115,5 @@ impl EngineAdapter for RemoteEngineAdapter {
             .get_account_balance(address, &self.coin_type)
             .await?
             .into_inner())
-    }
-}
-
-pub struct ResponseHandler<R> {
-    _marker: PhantomData<R>,
-    error: &'static str,
-}
-
-impl<R> ResponseHandler<R>
-where
-    R: DeserializeOwned,
-{
-    pub fn new(error: &'static str) -> Self {
-        Self {
-            _marker: Default::default(),
-            error,
-        }
-    }
-
-    pub async fn handle(&self, response: Response) -> Result<R> {
-        if response.status().is_success() {
-            let result = response.json::<R>().await?;
-            Ok(result)
-        } else {
-            Err(Self::handle_error(
-                self.error,
-                response.status(),
-                response.text().await?,
-            ))
-        }
-    }
-
-    fn handle_error(message: &'static str, status: StatusCode, error: String) -> anyhow::Error {
-        tracing::warn!("{}: status={}, message={}", message, status, error);
-        anyhow!(message)
     }
 }

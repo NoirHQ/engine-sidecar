@@ -1,7 +1,7 @@
 // Copyright © Aptos Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{HashValue, U64};
+use crate::{transaction::Transaction, HashValue, U64};
 use serde::{Deserialize, Serialize};
 
 /// A Block with or without transactions
@@ -15,7 +15,7 @@ pub struct Block {
     pub block_timestamp: U64,
     pub first_version: U64,
     pub last_version: U64,
-    // /// The transactions in the block in sequential order
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // pub transactions: Option<Vec<Transaction>>,
+    /// The transactions in the block in sequential order
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transactions: Option<Vec<Transaction>>,
 }

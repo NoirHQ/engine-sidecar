@@ -10,6 +10,7 @@
 //! just strings, using the FromStr impl to parse the path param. They can
 //! then be unpacked to the real type beneath.
 
+use crate::{Address, U64};
 use move_core_types::identifier::{IdentStr, Identifier};
 use serde::{Deserialize, Serialize};
 use std::{fmt, ops::Deref, str::FromStr};
@@ -72,4 +73,15 @@ impl fmt::Display for IdentifierWrapper {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         Identifier::fmt(&self.0, f)
     }
+}
+
+// Unlike IdentifierWrapper, we don't use this struct as a path / query param.
+// Instead, we define this wrapper struct for two reasons:
+// 1. To avoid implementing Poem derives on types outside of the API crate.
+// 2. To express the EventKey as types that already work in the API, such as
+//    Address and U64 instead of AccountAddress and u64.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct EventGuid {
+    pub creation_number: U64,
+    pub account_address: Address,
 }
